@@ -2,9 +2,11 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UserModule } from './user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { User } from './user/entities/user.entity';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { User } from './users/entities/user.entity';
+import { DataSource } from 'typeorm';
 
 @Module({
   imports: [
@@ -21,14 +23,17 @@ import { User } from './user/entities/user.entity';
         username: configService.get<string>('DATABASE_USER'),
         password: configService.get<string>('DATABASE_PASSWORD'),
         database: configService.get<string>('DATABASE_NAME'),
-        entities: [User],
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true,
         logging: true,
       }),
     }),
-    UserModule,
+    AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private dataSource: DataSource) {}
+}
