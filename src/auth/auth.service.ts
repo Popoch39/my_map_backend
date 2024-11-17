@@ -18,11 +18,11 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(payload: AuthPayloadDto) {
+  async signIn(payload: AuthPayloadDto): Promise<string> | null {
     const { password, email } = payload;
-    console.log(this.userService);
     const user = await this.userService.findByEmail(email);
 
+    if (!user) return null;
     if (user.password === password) {
       const { password, ...foundUser } = user;
       return this.jwtService.sign(foundUser);
